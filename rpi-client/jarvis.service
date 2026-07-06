@@ -1,0 +1,24 @@
+# ============================================================
+# PROJETO JARVIS — Serviço systemd (arranque automático)
+# Copiar para /etc/systemd/system/jarvis.service e ativar com:
+#   sudo systemctl enable --now jarvis
+# ============================================================
+[Unit]
+Description=JARVIS - assistente de voz (cliente dos oculos)
+# Só arranca depois de haver rede (precisa do backend)
+After=network-online.target sound.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/jarvis-pap/rpi-client
+# Variáveis de ambiente (URL do backend) — editar este ficheiro:
+EnvironmentFile=-/etc/default/jarvis
+ExecStart=/home/pi/jarvis-pap/rpi-client/.venv/bin/python /home/pi/jarvis-pap/rpi-client/jarvis_client.py
+# Reinicia sozinho se o programa falhar (fiabilidade na demonstração)
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

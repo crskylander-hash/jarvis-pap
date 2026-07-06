@@ -1,0 +1,11 @@
+# Dependências do backend JARVIS (Python 3.12)
+fastapi>=0.115,<1
+uvicorn>=0.30,<1
+anthropic>=0.40,<1
+httpx>=0.27,<1
+python-dotenv>=1.0,<2
+pydantic>=2.8,<3
+# Adaptador ASGI->WSGI para o deploy no PythonAnywhere (ver DEPLOY.md)
+a2wsgi>=1.10,<2
+# Testes
+pytest>=8.0,<9

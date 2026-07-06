@@ -1,0 +1,21 @@
+# Segredos — NUNCA enviar para o GitHub
+.env
+*.env
+!.env.example
+!**/.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Node / frontend
+node_modules/
+dist/
+.vite/
+
+# Sistema
+.DS_Store
+Thumbs.db

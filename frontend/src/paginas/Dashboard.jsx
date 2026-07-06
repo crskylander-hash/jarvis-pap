@@ -1,0 +1,118 @@
+// ============================================================
+// PROJETO JARVIS — Dashboard de métricas em tempo real
+//
+// • Nº de conversas, tokens usados, latência média e custo estimado
+// • Indicador online/offline do backend (GET /health a cada 30 s)
+// • Histórico recente
+// • Atualização automática via Supabase Realtime (broadcast)
+// ============================================================
+import { useEffect, useState } from 'react'
+import { verificarSaude } from '../servicos/api.js'
+import { obterHistorico, subscreverTempoReal } from '../servicos/supabase.js'
+
+// Preço médio estimado do claude-3-5-haiku por token (USD).
+// (mistura de entrada $0,80/M e saída $4/M — ver DECISOES.md)
+const PRECO_MEDIO_POR_TOKEN_USD = 2.4e-6
+
+/** Cartão de métrica simples. */
+function Cartao({ titulo, valor, unidade }) {
+  return (
+    <div className="rounded-2xl border border-jarvis-borda bg-jarvis-painel p-4">
+      <p className="text-xs uppercase tracking-wider text-jarvis-texto/50">{titulo}</p>
+      <p className="mt-1 text-2xl font-semibold text-jarvis-ciano">
+        {valor}
+        {unidade && <span className="ml-1 text-sm text-jarvis-texto/60">{unidade}</span>}
+      </p>
+    </div>
+  )
+}
+
+export default function Dashboard() {
+  const [conversas, setConversas] = useState([])
+  const [online, setOnline] = useState(null) // null = a verificar
+
+  const carregar = () => {
+    obterHistorico(200).then(setConversas).catch(() => setConversas([]))
+  }
+
+  // Histórico + atualização em tempo real
+  useEffect(() => {
+    carregar()
+    const cancelar = subscreverTempoReal(() => carregar())
+    return cancelar
+  }, [])
+
+  // Indicador online/offline: verifica o /health a cada 30 segundos
+  useEffect(() => {
+    const verificar = () => verificarSaude().then(setOnline)
+    verificar()
+    const intervalo = setInterval(verificar, 30000)
+    return () => clearInterval(intervalo)
+  }, [])
+
+  // ----- Cálculo das métricas a partir das conversas -----
+  const totalConversas = conversas.length
+  const totalTokens = conversas.reduce((soma, c) => soma + (c.tokens_used || 0), 0)
+  const comLatencia = conversas.filter((c) => c.latency_ms > 0)
+  const latenciaMedia = comLatencia.length
+    ? Math.round(comLatencia.reduce((s, c) => s + c.latency_ms, 0) / comLatencia.length)
+    : 0
+  const custoEstimado = (totalTokens * PRECO_MEDIO_POR_TOKEN_USD).toFixed(4)
+
+  return (
+    <div className="space-y-5">
+      {/* ---------- Estado do sistema ---------- */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-jarvis-ciano">Dashboard</h2>
+        <span
+          className={[
+            'flex items-center gap-2 rounded-full px-3 py-1 text-xs',
+            online === null
+              ? 'bg-jarvis-painel text-jarvis-texto/50'
+              : online
+                ? 'bg-emerald-500/10 text-emerald-400'
+                : 'bg-red-500/10 text-red-400',
+          ].join(' ')}
+        >
+          <span className={[
+            'h-2 w-2 rounded-full',
+            online === null ? 'bg-jarvis-texto/40' : online ? 'animate-pulse bg-emerald-400' : 'bg-red-400',
+          ].join(' ')} />
+          {online === null ? 'A verificar…' : online ? 'Sistema online' : 'Sistema offline'}
+        </span>
+      </div>
+
+      {/* ---------- Cartões de métricas ---------- */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <Cartao titulo="Conversas" valor={totalConversas} />
+        <Cartao titulo="Tokens usados" valor={totalTokens.toLocaleString('pt-PT')} />
+        <Cartao titulo="Latência média" valor={latenciaMedia} unidade="ms" />
+        <Cartao titulo="Custo estimado" valor={custoEstimado} unidade="USD" />
+      </div>
+
+      {/* ---------- Histórico recente ---------- */}
+      <div className="rounded-2xl border border-jarvis-borda bg-jarvis-painel">
+        <p className="border-b border-jarvis-borda px-4 py-3 text-xs uppercase tracking-wider text-jarvis-texto/50">
+          Histórico recente
+        </p>
+        {conversas.length === 0 ? (
+          <p className="p-4 text-sm text-jarvis-texto/50">Sem conversas registadas neste dispositivo.</p>
+        ) : (
+          <ul className="divide-y divide-jarvis-borda">
+            {[...conversas].reverse().slice(0, 15).map((c) => (
+              <li key={c.id} className="px-4 py-3 text-sm">
+                <p className="text-jarvis-ciano/90">🗣 {c.user_input}</p>
+                <p className="mt-1 line-clamp-2 text-jarvis-texto/70">🤖 {c.claude_response}</p>
+                <p className="mt-1 text-xs text-jarvis-texto/40">
+                  {new Date(c.timestamp).toLocaleString('pt-PT')}
+                  {' · '}{c.tokens_used} tokens · {c.latency_ms} ms
+                  {c.display_mode === 'app' && ' · 📱 app'}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  )
+}

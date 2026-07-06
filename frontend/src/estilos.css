@@ -1,0 +1,16 @@
+/* Estilos globais do JARVIS — Tailwind + pequenos extras */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fundo com um gradiente radial subtil, estética "reator arc" sóbria */
+body {
+  @apply bg-jarvis-fundo text-jarvis-texto;
+  background-image: radial-gradient(ellipse at 50% -20%, rgba(34, 211, 238, 0.08), transparent 60%);
+  min-height: 100vh;
+}
+
+/* Barra de scroll discreta, a condizer com o tema escuro */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1e2a4a; border-radius: 4px; }
