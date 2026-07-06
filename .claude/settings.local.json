@@ -7,7 +7,14 @@
       "PowerShell(python -m venv C:\\\\Users\\\\CarlosRafaelResendes\\\\jarvis-pap\\\\backend\\\\.venv)",
       "PowerShell(C:\\\\Users\\\\CarlosRafaelResendes\\\\jarvis-pap\\\\backend\\\\.venv\\\\Scripts\\\\python.exe -m pip install -q -r C:\\\\Users\\\\CarlosRafaelResendes\\\\jarvis-pap\\\\backend\\\\requirements.txt)",
       "PowerShell($p = 'C:\\\\Users\\\\CarlosRafaelResendes\\\\jarvis-pap\\\\frontend\\\\src\\\\servicos\\\\wakeword.js'; $c = Get-Content $p -Raw -Encoding utf8; $c = $c -replace '\\\\.replace\\\\\\(/\\\\[.{1,4}\\\\]/g, ''''\\\\\\) // remove acentos \\\\\\(diacríticos combinados\\\\\\)', '.replace\\(/[̀-ͯ]/g, ''''\\) // remove acentos \\(diacriticos combinados\\)'; [System.IO.File]::WriteAllText\\($p, $c, \\(New-Object System.Text.UTF8Encoding\\($false\\)\\)\\); Select-String -Path $p -Pattern 'u0300')",
-      "PowerShell($p = 'C:\\\\Users\\\\CarlosRafaelResendes\\\\jarvis-pap\\\\frontend\\\\src\\\\servicos\\\\wakeword.js'; $linhas = Get-Content $p -Encoding utf8; $linhas[22] = \"    .replace\\(/[̀-ͯ]/g, ''\\) // remove acentos \\(diacriticos combinados\\)\"; [System.IO.File]::WriteAllLines\\($p, $linhas, \\(New-Object System.Text.UTF8Encoding\\($false\\)\\)\\); \\(Get-Content $p -Encoding utf8\\)[22])"
+      "PowerShell($p = 'C:\\\\Users\\\\CarlosRafaelResendes\\\\jarvis-pap\\\\frontend\\\\src\\\\servicos\\\\wakeword.js'; $linhas = Get-Content $p -Encoding utf8; $linhas[22] = \"    .replace\\(/[̀-ͯ]/g, ''\\) // remove acentos \\(diacriticos combinados\\)\"; [System.IO.File]::WriteAllLines\\($p, $linhas, \\(New-Object System.Text.UTF8Encoding\\($false\\)\\)\\); \\(Get-Content $p -Encoding utf8\\)[22])",
+      "mcp__Claude_in_Chrome__list_connected_browsers",
+      "mcp__Claude_in_Chrome__select_browser",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "mcp__Claude_in_Chrome__browser_batch",
+      "mcp__Claude_in_Chrome__get_page_text",
+      "mcp__Claude_in_Chrome__navigate",
+      "mcp__Claude_in_Chrome__tabs_create_mcp"
     ]
   }
 }
