@@ -21,3 +21,5 @@ Cada decisão tomada durante o desenvolvimento, com a justificação curta.
 | 15 | Service worker "network-first" com cache de emergência | A interface abre offline (requisito de PWA), mas nunca serve respostas desatualizadas quando há rede. |
 | 16 | Ícones da PWA gerados localmente (PNG 192/512) | Instalabilidade garantida em Chrome/Edge/Android sem depender de serviços externos. |
 | 17 | Supabase Auth **não** implementado (documentado como melhoria futura) | Âmbito fechado da PAP; a identidade por `device_id` + RLS cumpre a privacidade sem contas. |
+| 18 | Botão "apagar histórico" **considerado e rejeitado** | O apagamento seria irreversível e o utilizador pode arrepender-se; sem contas, não haveria forma de recuperar. Preferiu-se proteger os dados do utilizador. |
+| 19 | Botão "reler resposta" (🔊), sugestões de comandos no ecrã inicial e gráfico de atividade no dashboard | Melhoram a demonstração ao vivo: reouvir respostas em salas com ruído, guiar quem experimenta a app e dar leitura visual imediata do uso. |
