@@ -7,6 +7,7 @@ import { NavLink, Route, Routes } from 'react-router-dom'
 import Conversa from './paginas/Conversa.jsx'
 import Leitura from './paginas/Leitura.jsx'
 import Dashboard from './paginas/Dashboard.jsx'
+import Sobre from './paginas/Sobre.jsx'
 
 // Estilo dos separadores de navegação (ativo = ciano)
 function classeSeparador({ isActive }) {
@@ -30,6 +31,7 @@ export default function App() {
           <NavLink to="/" end className={classeSeparador}>Conversa</NavLink>
           <NavLink to="/leitura" className={classeSeparador}>Leitura</NavLink>
           <NavLink to="/dashboard" className={classeSeparador}>Dashboard</NavLink>
+          <NavLink to="/sobre" className={classeSeparador}>Sobre</NavLink>
         </nav>
       </header>
 
@@ -39,6 +41,7 @@ export default function App() {
           <Route path="/" element={<Conversa />} />
           <Route path="/leitura" element={<Leitura />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/sobre" element={<Sobre />} />
         </Routes>
       </main>
 
