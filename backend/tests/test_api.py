@@ -50,9 +50,9 @@ def bd_simulada(monkeypatch):
 def claude_simulado(monkeypatch):
     """Substitui as chamadas à API da Anthropic por respostas fixas."""
     monkeypatch.setattr(servico_claude, "gerar_resposta",
-                        lambda h, m: ("Resposta simulada do JARVIS.", 42))
+                        lambda h, m, idioma="pt-PT": ("Resposta simulada do JARVIS.", 42))
     monkeypatch.setattr(servico_claude, "resumir_para_voz",
-                        lambda t: ("Resumo numa frase.", 10))
+                        lambda t, idioma="pt-PT": ("Resumo numa frase.", 10))
 
 
 # ------------------------------------------------------------
@@ -98,6 +98,33 @@ def test_chat_fluxo_normal(bd_simulada, claude_simulado):
     assert corpo["tokens_used"] == 42
     assert corpo["latency_ms"] >= 0
     assert len(bd_simulada) == 1  # gravou exatamente um turno
+
+
+def test_chat_com_idioma(bd_simulada, monkeypatch):
+    """O idioma escolhido na app chega ao serviço do modelo."""
+    idiomas_recebidos = []
+
+    def gerar_falso(historico, mensagem, idioma="pt-PT"):
+        idiomas_recebidos.append(idioma)
+        return ("Simulated JARVIS reply.", 42)
+
+    monkeypatch.setattr(servico_claude, "gerar_resposta", gerar_falso)
+    resposta = cliente.post("/chat", json={
+        "device_id": "dispositivo-teste-123",
+        "session_id": "sessao-teste-123",
+        "mensagem": "What time is it?",
+        "idioma": "en-GB",
+    })
+    assert resposta.status_code == 200
+    assert idiomas_recebidos == ["en-GB"]
+
+
+def test_system_prompt_muda_com_idioma():
+    """Em pt-PT o system prompt fica intacto; noutros idiomas ganha a instrução extra."""
+    base = servico_claude._system_prompt("pt-PT")
+    ingles = servico_claude._system_prompt("en-GB")
+    assert base == servico_claude.config.SYSTEM_PROMPT_JARVIS
+    assert "British English" in ingles
 
 
 # ------------------------------------------------------------

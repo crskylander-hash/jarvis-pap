@@ -8,6 +8,7 @@
 // ============================================================
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { detetarWakeWord } from './wakeword.js'
+import { obterIdioma } from './vozTTS.js'
 
 // O Chrome usa o prefixo "webkit"; o Firefox ainda não suporta esta API
 const Reconhecimento =
@@ -69,7 +70,7 @@ export function useReconhecimentoVoz(aoTerComando) {
   /** Cria e configura um reconhecedor novo. */
   const criarReconhecedor = useCallback(() => {
     const rec = new Reconhecimento()
-    rec.lang = 'pt-PT'            // reconhecimento em português de Portugal
+    rec.lang = obterIdioma()       // reconhecimento no idioma escolhido pelo utilizador
     rec.continuous = true          // não parar à primeira pausa
     rec.interimResults = true      // resultados provisórios (feedback visual)
 

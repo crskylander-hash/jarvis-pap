@@ -56,6 +56,8 @@ class PedidoChat(BaseModel):
     device_id: str = Field(min_length=8, description="UUID anónimo do dispositivo")
     session_id: str = Field(min_length=8, description="UUID da sessão de utilização")
     mensagem: str = Field(min_length=1, max_length=4000, description="Pergunta do utilizador")
+    # Idioma escolhido na app (opcional; por defeito português de Portugal)
+    idioma: str = Field(default="pt-PT", max_length=10, description="Idioma da resposta (ex.: pt-PT, en-GB)")
 
 
 class RespostaChat(BaseModel):
@@ -92,7 +94,7 @@ def chat(pedido: PedidoChat):
         historico = base_dados.obter_historico(pedido.device_id, config.TURNOS_MEMORIA)
 
         # 2) Chama o modelo (o SDK repete sozinho em caso de falha temporária)
-        texto, tokens = servico_claude.gerar_resposta(historico, pedido.mensagem)
+        texto, tokens = servico_claude.gerar_resposta(historico, pedido.mensagem, pedido.idioma)
 
         latencia = int((time.monotonic() - inicio) * 1000)
 
@@ -156,7 +158,7 @@ def _processar_envio_para_app(pedido: PedidoChat, inicio: float) -> RespostaChat
 
     # 2) Resumo de 1 frase para dizer por voz (com plano B se a API falhar)
     try:
-        resumo, tokens = servico_claude.resumir_para_voz(ultima["claude_response"])
+        resumo, tokens = servico_claude.resumir_para_voz(ultima["claude_response"], pedido.idioma)
     except Exception:  # noqa: BLE001 — o envio nunca falha por causa do resumo
         resumo, tokens = utils.resumo_fallback(ultima["claude_response"]), 0
 

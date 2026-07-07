@@ -11,6 +11,29 @@
 
 const CHAVE_VELOCIDADE = 'jarvis_tts_velocidade'
 const CHAVE_VOZ = 'jarvis_tts_voz'
+const CHAVE_IDIOMA = 'jarvis_idioma'
+
+// ------------------------------------------------------------
+// Idioma da conversa (afeta o reconhecimento, a voz e a resposta)
+// ------------------------------------------------------------
+export const IDIOMAS = [
+  { codigo: 'pt-PT', nome: '🇵🇹 Português' },
+  { codigo: 'en-GB', nome: '🇬🇧 English' },
+  { codigo: 'es-ES', nome: '🇪🇸 Español' },
+  { codigo: 'fr-FR', nome: '🇫🇷 Français' },
+]
+
+/** Idioma escolhido (por defeito, português de Portugal). */
+export function obterIdioma() {
+  const guardado = localStorage.getItem(CHAVE_IDIOMA)
+  return IDIOMAS.some((i) => i.codigo === guardado) ? guardado : 'pt-PT'
+}
+
+/** Guarda o idioma e limpa a voz escolhida (para voltar à automática). */
+export function definirIdioma(codigo) {
+  localStorage.setItem(CHAVE_IDIOMA, codigo)
+  localStorage.removeItem(CHAVE_VOZ)
+}
 
 // ------------------------------------------------------------
 // Velocidade
@@ -29,11 +52,13 @@ export function definirVelocidade(v) {
 // ------------------------------------------------------------
 // Escolha da voz
 // ------------------------------------------------------------
-/** Lista todas as vozes portuguesas disponíveis neste dispositivo. */
-export function listarVozesPortuguesas() {
+/** Lista as vozes do dispositivo para o idioma escolhido
+ *  (ex.: idioma "en-GB" mostra todas as vozes "en-..."). */
+export function listarVozesDoIdioma() {
+  const prefixo = obterIdioma().slice(0, 2).toLowerCase()
   return window.speechSynthesis
     .getVoices()
-    .filter((v) => v.lang.toLowerCase().startsWith('pt'))
+    .filter((v) => v.lang.toLowerCase().startsWith(prefixo))
 }
 
 /** Nome da voz escolhida pelo utilizador (vazio = automática). */
@@ -47,17 +72,19 @@ export function definirVozEscolhida(nome) {
 }
 
 /** Devolve a voz a usar: a escolhida pelo utilizador ou, na falta dela,
- *  a melhor voz portuguesa disponível (preferência pt-PT). */
-function escolherVozPortuguesa() {
+ *  a melhor voz disponível para o idioma da conversa. */
+function escolherVoz() {
   const vozes = window.speechSynthesis.getVoices()
   const nomeGuardado = obterNomeVozEscolhida()
   if (nomeGuardado) {
     const escolhida = vozes.find((v) => v.name === nomeGuardado)
     if (escolhida) return escolhida
   }
+  const idioma = obterIdioma()
+  const prefixo = idioma.slice(0, 2).toLowerCase()
   return (
-    vozes.find((v) => v.lang === 'pt-PT') ||
-    vozes.find((v) => v.lang.toLowerCase().startsWith('pt')) ||
+    vozes.find((v) => v.lang === idioma) ||
+    vozes.find((v) => v.lang.toLowerCase().startsWith(prefixo)) ||
     null
   )
 }
@@ -108,12 +135,12 @@ function dividirEmPedacos(texto) {
 export function falar(texto, aoTerminar) {
   parar() // interrompe qualquer fala anterior
 
-  const voz = escolherVozPortuguesa()
+  const voz = escolherVoz()
   const pedacos = dividirEmPedacos(texto)
 
   pedacos.forEach((pedaco, indice) => {
     const fala = new SpeechSynthesisUtterance(pedaco)
-    fala.lang = 'pt-PT'
+    fala.lang = obterIdioma()
     fala.rate = obterVelocidade()
     if (voz) fala.voice = voz
 

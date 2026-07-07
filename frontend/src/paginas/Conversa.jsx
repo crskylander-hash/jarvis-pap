@@ -102,6 +102,20 @@ export default function Conversa() {
     setTextoEscrito('')
   }
 
+  /** Descarrega a conversa atual num ficheiro de texto. */
+  const exportarConversa = () => {
+    const linhas = mensagens.map((m) =>
+      `${m.papel === 'utilizador' ? 'EU' : 'JARVIS'}: ${m.texto}`
+    )
+    const conteudo = `Conversa com o JARVIS\n${'='.repeat(30)}\n\n${linhas.join('\n\n')}\n`
+    const ficheiro = new Blob([conteudo], { type: 'text/plain;charset=utf-8' })
+    const ligacao = document.createElement('a')
+    ligacao.href = URL.createObjectURL(ficheiro)
+    ligacao.download = 'conversa-jarvis.txt'
+    ligacao.click()
+    URL.revokeObjectURL(ligacao.href)
+  }
+
   return (
     <div className="flex h-[calc(100vh-160px)] flex-col">
       {/* ---------- Zona de mensagens ---------- */}
@@ -202,6 +216,18 @@ export default function Conversa() {
 
       {/* ---------- Velocidade da voz ---------- */}
       <ControloVelocidade />
+
+      {/* ---------- Exportar a conversa ---------- */}
+      {mensagens.length > 0 && (
+        <div className="flex justify-center pt-2">
+          <button
+            onClick={exportarConversa}
+            className="text-xs text-jarvis-texto/40 transition-colors hover:text-jarvis-ciano"
+          >
+            ⬇ Exportar conversa (.txt)
+          </button>
+        </div>
+      )}
 
       {/* ---------- Entrada por texto (alternativa ao microfone) ---------- */}
       <form onSubmit={enviarTexto} className="flex gap-2 pt-3">

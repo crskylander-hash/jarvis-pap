@@ -2,6 +2,7 @@
 // PROJETO JARVIS — Comunicação com o backend FastAPI
 // ============================================================
 import { obterDeviceId, obterSessionId } from './dispositivo.js'
+import { obterIdioma } from './vozTTS.js'
 
 // URL do backend (definida no .env / variáveis da Vercel)
 const URL_BACKEND = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000'
@@ -16,6 +17,7 @@ export async function enviarMensagem(mensagem) {
       device_id: obterDeviceId(),
       session_id: obterSessionId(),
       mensagem,
+      idioma: obterIdioma(), // o JARVIS responde no idioma escolhido na app
     }),
   })
 

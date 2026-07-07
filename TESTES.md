@@ -9,7 +9,7 @@ Correr na pasta `backend` (com o venv ativo):
 pytest tests -q                                  (Linux/PythonAnywhere)
 ```
 
-**Resultado atual: 17 testes, todos a passar** ✅
+**Resultado atual: 19 testes, todos a passar** ✅
 Cobrem: `/health`, validação do `/chat` (422), fluxo normal de conversa,
 comando "envia para a app" (com e sem histórico), deteção do comando em
 6 variações de frase + 4 frases que NÃO devem disparar, e o resumo de
@@ -38,6 +38,12 @@ Marcar cada item depois de testar no browser (Chrome/Edge recomendado).
 - [ ] A notificação aparece (se as notificações foram autorizadas)
 - [ ] Na página **Leitura** está a resposta completa, com a pergunta e a hora
 - [ ] Variações: «manda para o telemóvel», «podes enviar isso para a aplicação»
+
+### Idioma, vozes e exportação
+- [ ] Mudar o "Idioma" para English → falar em inglês → o JARVIS responde em inglês, com voz inglesa
+- [ ] Voltar a Português → tudo regressa ao normal (e a escolha sobrevive ao recarregar)
+- [ ] O menu "Voz" só mostra vozes do idioma escolhido; escolher uma diferente muda a voz
+- [ ] Botão "⬇ Exportar conversa" descarrega um .txt com a conversa completa
 
 ### Histórico, memória e privacidade
 - [ ] Recarregar a página → a conversa anterior continua lá (device_id no localStorage)
