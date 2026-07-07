@@ -10,9 +10,9 @@ import { useEffect, useState } from 'react'
 import { verificarSaude } from '../servicos/api.js'
 import { obterHistorico, subscreverTempoReal } from '../servicos/supabase.js'
 
-// Preço médio estimado do claude-3-5-haiku por token (USD).
-// (mistura de entrada $0,80/M e saída $4/M — ver DECISOES.md)
-const PRECO_MEDIO_POR_TOKEN_USD = 2.4e-6
+// Preço médio estimado do claude-haiku-4-5 por token (USD).
+// (mistura de entrada $1/M e saída $5/M — ver DECISOES.md)
+const PRECO_MEDIO_POR_TOKEN_USD = 2.2e-6
 
 /** Cartão de métrica simples. */
 function Cartao({ titulo, valor, unidade }) {

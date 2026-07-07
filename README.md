@@ -17,7 +17,7 @@ O JARVIS é um assistente virtual de voz inspirado no do Iron Man, com dois
                      ▼
         [Backend FastAPI @ PythonAnywhere]
           • memória: últimos 10 turnos por dispositivo
-          • chama a API Anthropic (claude-3-5-haiku)
+          • chama a API Anthropic (claude-haiku-4-5)
           • grava tudo no Supabase
                      ▼
         [Supabase PostgreSQL + RLS]

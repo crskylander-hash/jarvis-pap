@@ -1,7 +1,8 @@
 # ============================================================
 # PROJETO JARVIS — Serviço de ligação à API da Anthropic
 # Constrói o prompt (system prompt + memória) e chama o modelo
-# claude-3-5-haiku com tentativas automáticas em caso de falha.
+# Haiku da Anthropic (definido em config.py / variável de ambiente)
+# com tentativas automáticas em caso de falha.
 # ============================================================
 import logging
 

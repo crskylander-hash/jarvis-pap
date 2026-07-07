@@ -4,13 +4,13 @@ Cada decisão tomada durante o desenvolvimento, com a justificação curta.
 
 | # | Decisão | Justificação |
 |---|---------|--------------|
-| 1 | Modelo fixado em `claude-3-5-haiku-20241022` (versão datada, não "latest") | Garante que a demo se comporta igual no dia da defesa; sem surpresas de atualizações. |
+| 1 | Modelo fixado em `claude-haiku-4-5-20251001` (versão datada, não "latest") | Garante que a demo se comporta igual no dia da defesa. Nota: o plano inicial usava o claude-3-5-haiku, mas esse modelo foi entretanto descontinuado pela Anthropic (descoberto no deploy — o modelo ser configurável por variável de ambiente tornou a troca trivial). |
 | 2 | Backend acede ao Supabase por REST (PostgREST) com `httpx`, sem biblioteca extra | Menos dependências no PythonAnywhere, código mais fácil de explicar ao júri; a service key vai nos cabeçalhos. |
 | 3 | Retry da API Anthropic via `max_retries=3` do próprio SDK | O SDK já faz espera exponencial em erros temporários (429/5xx/rede) — mais fiável do que reimplementar. |
 | 4 | RLS por cabeçalho HTTP `x-device-id` nas leituras | Sem contas de utilizador, o RLS compara o `device_id` da linha com o cabeçalho enviado pelo frontend — cada dispositivo só lê o que é seu, imposto na base de dados. |
 | 5 | Tempo real via **Realtime Broadcast** (canal `device-<uuid>`) e não `postgres_changes` | O `postgres_changes` respeita RLS mas não recebe o cabeçalho do dispositivo no WebSocket, pelo que nunca entregaria eventos. O broadcast leva **apenas identificadores** ("campainha"); os dados são sempre lidos por REST com RLS. Canal com UUID de 122 bits, impossível de adivinhar. |
 | 6 | Coluna extra `latency_ms` na tabela `conversations` | O dashboard exige "latência média"; sem guardar a latência de cada turno, a métrica não existiria. |
-| 7 | Custo estimado no dashboard com preço médio de 2,4 USD/M tokens | Guardamos tokens de entrada+saída somados; usamos a média ponderada dos preços do Haiku 3.5 (entrada 0,80 USD/M, saída 4 USD/M). É uma estimativa, e está identificada como tal. |
+| 7 | Custo estimado no dashboard com preço médio de 2,2 USD/M tokens | Guardamos tokens de entrada+saída somados; usamos a média ponderada dos preços do Haiku 4.5 (entrada 1 USD/M, saída 5 USD/M). É uma estimativa, e está identificada como tal. |
 | 8 | `session_id` novo por separador/arranque (sessionStorage na PWA; a cada boot no RPi) | Definição natural de "sessão de utilização"; morre quando a app fecha. |
 | 9 | Deteção do comando "envia para a app" no backend, por expressão regular sem acentos | Apanha variações naturais (enviar/manda/passa + app/aplicação/telemóvel/telefone) vindas de voz ou texto, e funciona igual para a PWA e para os óculos. |
 | 10 | Resumo de 1 frase gerado pelo modelo, com *fallback* local (primeira frase) | Qualidade do resumo quando a API está disponível; se falhar, o envio para a app nunca fica bloqueado. |

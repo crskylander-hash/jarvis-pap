@@ -17,7 +17,9 @@ SUPABASE_URL = os.getenv("SUPABASE_URL", "").rstrip("/")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "")
 
 # Modelo da Anthropic a usar (fixado numa versão estável)
-ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-3-5-haiku-20241022")
+# Nota: o claude-3-5-haiku-20241022 foi descontinuado pela Anthropic;
+# usamos o Haiku 4.5, o modelo rápido/económico atual (julho de 2026).
+ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
 
 # Domínios autorizados a chamar o backend (CORS).
 # Aceita vários separados por vírgula, ex.: "https://jarvis.vercel.app,http://localhost:5173"

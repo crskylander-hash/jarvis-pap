@@ -1,4 +1,4 @@
-# DEPLOY.md — Pôr o JARVIS online, passo a passo
+﻿# DEPLOY.md — Pôr o JARVIS online, passo a passo
 
 Guia escrito para seguir pelo browser, pela ordem indicada.
 Tempo total estimado: **~40 minutos**.
@@ -38,37 +38,39 @@ Antes de começar, tem à mão (num bloco de notas temporário — apaga no fim)
    ```bash
    nano ~/jarvis-pap/backend/.env
    ```
-   Conteúdo (substitui pelos teus valores reais):
+   Conteúdo (substitui pelos teus valores reais). As duas linhas
+   `*_PROXY` são OBRIGATÓRIAS nas contas gratuitas — sem elas, a app
+   não consegue falar com o Supabase nem com a Anthropic:
    ```
    ANTHROPIC_API_KEY=sk-ant-...
-   ANTHROPIC_MODEL=claude-3-5-haiku-20241022
+   ANTHROPIC_MODEL=claude-haiku-4-5-20251001
    SUPABASE_URL=https://xxxx.supabase.co
    SUPABASE_SERVICE_KEY=eyJ...
    FRONTEND_URL=http://localhost:5173
+   HTTP_PROXY=http://proxy.server:3128
+   HTTPS_PROXY=http://proxy.server:3128
    ```
    (o `FRONTEND_URL` será atualizado no Passo 4)
    Gravar: `Ctrl+O`, Enter, `Ctrl+X`.
-4. Vai ao separador **Web** → **Add a new web app**:
-   - Domínio: aceita o sugerido (`oteuusername.pythonanywhere.com`)
-   - Framework: **Manual configuration** → **Python 3.12** (ou 3.11)
-5. Ainda no separador Web:
-   - Em **Virtualenv**, escreve: `/home/oteuusername/.virtualenvs/jarvis`
-   - Em **Code → WSGI configuration file**, clica no link e SUBSTITUI o
-     conteúdo todo por:
-     ```python
-     # WSGI do JARVIS — liga o PythonAnywhere (WSGI) ao FastAPI (ASGI)
-     import sys
-     sys.path.insert(0, '/home/oteuusername/jarvis-pap/backend')
-
-     from a2wsgi import ASGIMiddleware
-     from main import app
-
-     application = ASGIMiddleware(app)
-     ```
-     (troca `oteuusername` pelo teu username!)
-6. Clica no botão verde **Reload**.
-7. Testa no browser: `https://oteuusername.pythonanywhere.com/health`
+   ⚠️ Cuidado ao colar: cada linha deve ter o nome UMA só vez
+   (`SUPABASE_URL=https://...`, nunca `SUPABASE_URL=SUPABASE_URL=https://...`).
+4. Cria o token da API: menu **Account** → separador **API Token**
+   → **Create a new API token**.
+5. O FastAPI é ASGI, por isso usamos o modo ASGI do PythonAnywhere
+   (o modo clássico WSGI não serve). Abre uma consola Bash **NOVA**
+   (para apanhar o token) e corre:
+   ```bash
+   pip install --user --upgrade pythonanywhere
+   pa website create --domain oteuusername.pythonanywhere.com --command '/home/oteuusername/.virtualenvs/jarvis/bin/uvicorn --app-dir /home/oteuusername/jarvis-pap/backend --uds $DOMAIN_SOCKET main:app'
+   ```
+   (troca `oteuusername` pelo teu username, nos DOIS sítios; mantém as plicas)
+   Deve responder "All done! Your site is now live".
+6. Testa no browser: `https://oteuusername.pythonanywhere.com/health`
    → deve responder `{"estado":"online", ...}`. O Swagger está em `/docs`.
+7. 📌 Sempre que mudares o código ou o `.env`, aplica com:
+   ```bash
+   pa website reload --domain oteuusername.pythonanywhere.com
+   ```
 
 ## PASSO 3 — Vercel (frontend/PWA) · ~10 min
 
@@ -107,7 +109,8 @@ Antes de começar, tem à mão (num bloco de notas temporário — apaga no fim)
 
 | Sintoma | Causa provável | Solução |
 |---|---|---|
-| `/health` dá "Something went wrong" | WSGI mal configurado | Vê o **error log** no separador Web; confirma o caminho no `sys.path` e o virtualenv |
-| A app diz "erro ao contactar o JARVIS" | CORS | O `FRONTEND_URL` no `.env` do backend tem de ser EXATAMENTE o domínio da Vercel (com https, sem barra final) + Reload |
+| `/health` não responde | Site ASGI mal criado | `pa website get --domain oteuusername.pythonanywhere.com` e vê o log em `/var/log/oteuusername.pythonanywhere.com.error.log` |
+| 503 "Falha ao aceder à base de dados" | Faltam as linhas `HTTP_PROXY`/`HTTPS_PROXY` no `.env`, ou URL/chave com gralha | Confere o `.env` (Passo 2.3) + `pa website reload` |
+| 503 "serviço de IA indisponível" | Chave Anthropic errada, sem crédito, ou modelo descontinuado | Verifica chave e saldo em console.anthropic.com; confirma o `ANTHROPIC_MODEL` |
+| A app diz "erro ao contactar o JARVIS" | CORS | O `FRONTEND_URL` no `.env` do backend tem de ser EXATAMENTE o domínio da Vercel (com https, sem barra final) + `pa website reload` |
 | Respostas não aparecem no histórico | schema.sql não corrido | Passo 1.3 |
-| 503 "serviço de IA indisponível" | Chave Anthropic errada ou sem crédito | Verifica a chave e o saldo em console.anthropic.com |

@@ -14,7 +14,11 @@
       "mcp__Claude_in_Chrome__browser_batch",
       "mcp__Claude_in_Chrome__get_page_text",
       "mcp__Claude_in_Chrome__navigate",
-      "mcp__Claude_in_Chrome__tabs_create_mcp"
+      "mcp__Claude_in_Chrome__tabs_create_mcp",
+      "PowerShell($corpo = @{ device_id = \"teste-deploy-carlos-0001\"; session_id = \"sessao-teste-deploy-01\"; mensagem = \"Ola JARVIS, apresenta-te numa frase.\" } | ConvertTo-Json; try { $r = Invoke-RestMethod -Uri \"https://lewist.pythonanywhere.com/chat\" -Method Post -ContentType \"application/json\" -Body $corpo -TimeoutSec 60; $r | ConvertTo-Json } catch { Write-Output \"ERRO: $\\($_.Exception.Message\\)\"; if \\($_.ErrorDetails.Message\\) { Write-Output $_.ErrorDetails.Message } })",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"https://qylludljdogjeggoskgf.supabase.co/rest/v1/\" -TimeoutSec 15 -UseBasicParsing; Write-Output \"HTTP $\\($r.StatusCode\\)\" } catch { $codigo = $_.Exception.Response.StatusCode.value__; Write-Output \"HTTP $codigo \\(esperado 401 = URL valido, so falta chave\\)\" })",
+      "PowerShell($corpo = @{ device_id = \"teste-deploy-carlos-0001\"; session_id = \"sessao-teste-deploy-01\"; mensagem = \"Ola JARVIS, apresenta-te numa frase.\" } | ConvertTo-Json; try { $r = Invoke-RestMethod -Uri \"https://lewist.pythonanywhere.com/chat\" -Method Post -ContentType \"application/json\" -Body $corpo -TimeoutSec 90; $r | ConvertTo-Json } catch { Write-Output \"ERRO: $\\($_.Exception.Message\\)\"; if \\($_.ErrorDetails.Message\\) { Write-Output $_.ErrorDetails.Message } })",
+      "PowerShell(Set-Location C:\\\\Users\\\\CarlosRafaelResendes\\\\jarvis-pap; $ficheiros = @\\('.env.example', 'backend\\\\.env.example', 'DEPLOY.md'\\); foreach \\($f in $ficheiros\\) { \\(Get-Content $f -Raw -Encoding utf8\\) -replace 'claude-3-5-haiku-20241022', 'claude-haiku-4-5-20251001' | Set-Content $f -NoNewline -Encoding utf8 }; Select-String -Path $ficheiros -Pattern \"ANTHROPIC_MODEL\" | ForEach-Object { \"$\\($_.Filename\\): $\\($_.Line\\)\" })"
     ]
   }
 }
