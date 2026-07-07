@@ -1,8 +1,9 @@
 // ============================================================
 // PROJETO JARVIS — Bolha de mensagem da conversa
 // Utilizador à direita (ciano), JARVIS à esquerda (painel escuro).
+// As respostas do JARVIS têm um botão 🔊 para voltar a ouvir.
 // ============================================================
-export default function BolhaMensagem({ papel, texto, paraApp }) {
+export default function BolhaMensagem({ papel, texto, paraApp, aoReler }) {
   const eUtilizador = papel === 'utilizador'
   return (
     <div className={eUtilizador ? 'flex justify-end' : 'flex justify-start'}>
@@ -15,9 +16,20 @@ export default function BolhaMensagem({ papel, texto, paraApp }) {
         ].join(' ')}
       >
         {texto}
-        {/* Etiqueta quando a resposta foi enviada para a vista de leitura */}
-        {paraApp && (
-          <span className="mt-1 block text-xs text-jarvis-ciano/70">📱 enviada para a app</span>
+        {/* Rodapé da bolha: etiqueta "enviada para a app" + botão de reler */}
+        {(paraApp || (!eUtilizador && aoReler)) && (
+          <span className="mt-1 flex items-center gap-3 text-xs text-jarvis-ciano/70">
+            {paraApp && <span>📱 enviada para a app</span>}
+            {!eUtilizador && aoReler && (
+              <button
+                onClick={aoReler}
+                title="Voltar a ouvir esta resposta"
+                className="rounded px-1 transition-colors hover:text-jarvis-ciano"
+              >
+                🔊 reler
+              </button>
+            )}
+          </span>
         )}
       </div>
     </div>

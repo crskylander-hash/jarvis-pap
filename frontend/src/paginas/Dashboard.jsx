@@ -14,6 +14,50 @@ import { obterHistorico, subscreverTempoReal } from '../servicos/supabase.js'
 // (mistura de entrada $1/M e saída $5/M — ver DECISOES.md)
 const PRECO_MEDIO_POR_TOKEN_USD = 2.2e-6
 
+/** Gráfico de barras simples: conversas por dia, últimos 7 dias.
+ *  Feito só com divs + Tailwind (sem bibliotecas externas). */
+function GraficoAtividade({ conversas }) {
+  // Prepara os últimos 7 dias (do mais antigo para hoje)
+  const dias = []
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    dias.push({
+      chave: d.toISOString().slice(0, 10),            // "2026-07-07"
+      rotulo: d.toLocaleDateString('pt-PT', { weekday: 'short' }), // "seg."
+      total: 0,
+    })
+  }
+  // Conta as conversas de cada dia
+  for (const c of conversas) {
+    const chave = String(c.timestamp).slice(0, 10)
+    const dia = dias.find((d) => d.chave === chave)
+    if (dia) dia.total++
+  }
+  const maximo = Math.max(1, ...dias.map((d) => d.total))
+
+  return (
+    <div className="rounded-2xl border border-jarvis-borda bg-jarvis-painel p-4">
+      <p className="mb-3 text-xs uppercase tracking-wider text-jarvis-texto/50">
+        Atividade dos últimos 7 dias
+      </p>
+      <div className="flex h-28 items-end justify-between gap-2">
+        {dias.map((d) => (
+          <div key={d.chave} className="flex flex-1 flex-col items-center gap-1">
+            <span className="text-xs text-jarvis-ciano">{d.total > 0 ? d.total : ''}</span>
+            <div
+              className="w-full rounded-t bg-jarvis-ciano/60 transition-all"
+              style={{ height: `${(d.total / maximo) * 80}px`, minHeight: d.total > 0 ? '4px' : '1px' }}
+              title={`${d.total} conversa(s)`}
+            />
+            <span className="text-[10px] text-jarvis-texto/50">{d.rotulo}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 /** Cartão de métrica simples. */
 function Cartao({ titulo, valor, unidade }) {
   return (
@@ -89,6 +133,9 @@ export default function Dashboard() {
         <Cartao titulo="Latência média" valor={latenciaMedia} unidade="ms" />
         <Cartao titulo="Custo estimado" valor={custoEstimado} unidade="USD" />
       </div>
+
+      {/* ---------- Gráfico de atividade ---------- */}
+      <GraficoAtividade conversas={conversas} />
 
       {/* ---------- Histórico recente ---------- */}
       <div className="rounded-2xl border border-jarvis-borda bg-jarvis-painel">

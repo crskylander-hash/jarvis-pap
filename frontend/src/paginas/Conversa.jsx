@@ -14,6 +14,14 @@ import * as tts from '../servicos/vozTTS.js'
 import BolhaMensagem from '../componentes/BolhaMensagem.jsx'
 import ControloVelocidade from '../componentes/ControloVelocidade.jsx'
 
+// Sugestões mostradas quando a conversa está vazia (guiam a demonstração)
+const SUGESTOES = [
+  'Quem és tu?',
+  'Conta-me uma curiosidade sobre o espaço',
+  'Explica-me a Revolução dos Cravos em detalhe',
+  'O que consegues fazer?',
+]
+
 export default function Conversa() {
   const [mensagens, setMensagens] = useState([])       // conversa no ecrã
   const [aProcessar, setAProcessar] = useState(false)  // à espera do backend
@@ -99,13 +107,37 @@ export default function Conversa() {
       {/* ---------- Zona de mensagens ---------- */}
       <div className="flex-1 space-y-3 overflow-y-auto pr-1">
         {mensagens.length === 0 && (
-          <p className="pt-16 text-center text-sm text-jarvis-texto/50">
-            Diz «JARVIS» no modo mãos-livres, toca no anel para falar,
-            <br />ou escreve a tua pergunta em baixo.
-          </p>
+          <div className="pt-12 text-center">
+            <p className="text-sm text-jarvis-texto/50">
+              Diz «JARVIS» no modo mãos-livres, toca no anel para falar,
+              <br />ou escreve a tua pergunta em baixo.
+            </p>
+            {/* Sugestões clicáveis para começar a conversa */}
+            <div className="mx-auto mt-6 flex max-w-md flex-wrap justify-center gap-2">
+              {SUGESTOES.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => enviar(s)}
+                  className="rounded-full border border-jarvis-borda bg-jarvis-painel px-3 py-1.5 text-xs text-jarvis-texto/70 transition-colors hover:border-jarvis-ciano hover:text-jarvis-ciano"
+                >
+                  💡 {s}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
         {mensagens.map((m, i) => (
-          <BolhaMensagem key={i} papel={m.papel} texto={m.texto} paraApp={m.paraApp} />
+          <BolhaMensagem
+            key={i}
+            papel={m.papel}
+            texto={m.texto}
+            paraApp={m.paraApp}
+            aoReler={
+              m.papel === 'jarvis'
+                ? () => { setAFalar(true); tts.falar(m.texto, () => setAFalar(false)) }
+                : undefined
+            }
+          />
         ))}
         {aProcessar && (
           <p className="animate-pulse text-sm text-jarvis-ciano">O JARVIS está a pensar…</p>
