@@ -49,6 +49,7 @@ O JARVIS é um assistente virtual de voz inspirado no do Iron Man, com dois
 | `frontend/` | PWA em React 18 + Tailwind (Vite) |
 | `rpi-client/` | Cliente Python dos óculos (Vosk + espeak-ng) + guia de montagem do SO |
 | `schema.sql` | Base de dados: tabelas + RLS, pronto a colar no Supabase |
+| `INSTALACAO.md` | Instalação a partir do zero (PC novo, sem nada instalado) |
 | `DEPLOY.md` | Deploy passo a passo (Supabase → PythonAnywhere → Vercel) |
 | `DECISOES.md` | Decisões técnicas com justificação (para a defesa) |
 | `TESTES.md` | Testes automáticos + checklist manual |
