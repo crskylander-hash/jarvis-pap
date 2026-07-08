@@ -1,7 +1,15 @@
 // ============================================================
 // PROJETO JARVIS — Página "Sobre"
-// Informação sobre o autor, a escola e a razão de ser do projeto.
+// Informação sobre o autor, a escola e a razão de ser do projeto,
+// mais a instalação da app e a transferência do código (open source).
 // ============================================================
+import { useState } from 'react'
+import { instalarApp, podeInstalarDireto } from '../servicos/instalacao.js'
+
+// Ligação direta para descarregar TODO o código do projeto (.zip)
+const LIGACAO_CODIGO_ZIP =
+  'https://github.com/crskylander-hash/jarvis-pap/archive/refs/heads/main.zip'
+const LIGACAO_GITHUB = 'https://github.com/crskylander-hash/jarvis-pap'
 
 /** Secção com título ciano e conteúdo. */
 function Seccao({ titulo, children }) {
@@ -16,9 +24,57 @@ function Seccao({ titulo, children }) {
 }
 
 export default function Sobre() {
+  const [estadoInstalacao, setEstadoInstalacao] = useState('')
+
+  const aoInstalar = async () => {
+    if (podeInstalarDireto()) {
+      const aceitou = await instalarApp()
+      setEstadoInstalacao(aceitou ? 'App instalada! Procura o ícone do JARVIS no teu dispositivo 🎉' : '')
+    } else {
+      // Sem o evento (já instalada, ou iPhone/Safari): instruções manuais
+      setEstadoInstalacao(
+        'Se a app já não estiver instalada: no PC usa o ícone de instalação na barra de endereço; ' +
+        'no Android: menu ⋮ → «Adicionar ao ecrã principal»; no iPhone: Partilhar → «Adicionar ao ecrã principal».'
+      )
+    }
+  }
+
   return (
     <div className="space-y-4">
       <h2 className="text-lg font-semibold text-jarvis-ciano">Sobre</h2>
+
+      {/* ---------- Instalar e descarregar (open source) ---------- */}
+      <Seccao titulo="Instalar e descarregar">
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={aoInstalar}
+            className="rounded-lg border border-jarvis-ciano bg-jarvis-ciano/10 px-4 py-2 text-sm font-medium text-jarvis-ciano transition-colors hover:bg-jarvis-ciano/20"
+          >
+            ⬇ Instalar a app (PC/telemóvel)
+          </button>
+          <a
+            href={LIGACAO_CODIGO_ZIP}
+            className="rounded-lg border border-jarvis-borda bg-jarvis-fundo px-4 py-2 text-sm text-jarvis-texto/80 transition-colors hover:border-jarvis-ciano hover:text-jarvis-ciano"
+          >
+            📦 Descarregar o código (.zip)
+          </a>
+          <a
+            href={LIGACAO_GITHUB}
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-lg border border-jarvis-borda bg-jarvis-fundo px-4 py-2 text-sm text-jarvis-texto/80 transition-colors hover:border-jarvis-ciano hover:text-jarvis-ciano"
+          >
+            🐙 Ver no GitHub
+          </a>
+        </div>
+        {estadoInstalacao && (
+          <p className="mt-3 text-xs leading-relaxed text-jarvis-ciano/80">{estadoInstalacao}</p>
+        )}
+        <p className="mt-3 text-xs text-jarvis-texto/50">
+          O JARVIS é software livre (licença MIT): podes descarregar, estudar,
+          alterar e usar o código — no PC ou no telemóvel — gratuitamente.
+        </p>
+      </Seccao>
 
       <Seccao titulo="O que é o JARVIS">
         <p>

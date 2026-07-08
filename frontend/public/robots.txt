@@ -1,0 +1,5 @@
+# JARVIS — autorizar a indexação por todos os motores de busca
+User-agent: *
+Allow: /
+
+Sitemap: https://jarvis-pap.vercel.app/sitemap.xml
