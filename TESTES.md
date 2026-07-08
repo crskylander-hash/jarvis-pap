@@ -9,7 +9,7 @@ Correr na pasta `backend` (com o venv ativo):
 pytest tests -q                                  (Linux/PythonAnywhere)
 ```
 
-**Resultado atual: 19 testes, todos a passar** ✅
+**Resultado atual: 21 testes, todos a passar** ✅
 Cobrem: `/health`, validação do `/chat` (422), fluxo normal de conversa,
 comando "envia para a app" (com e sem histórico), deteção do comando em
 6 variações de frase + 4 frases que NÃO devem disparar, e o resumo de
@@ -38,6 +38,16 @@ Marcar cada item depois de testar no browser (Chrome/Edge recomendado).
 - [ ] A notificação aparece (se as notificações foram autorizadas)
 - [ ] Na página **Leitura** está a resposta completa, com a pergunta e a hora
 - [ ] Variações: «manda para o telemóvel», «podes enviar isso para a aplicação»
+
+### Histórico, nova conversa e anexos
+- [ ] Botão "🆕 Nova conversa" limpa o ecrã; a conversa anterior aparece na página **Histórico**
+- [ ] No Histórico, cada sessão expande/fecha ao clicar; a sessão atual tem a etiqueta "atual"
+- [ ] "⬇ Exportar tudo" descarrega um .txt com todas as conversas agrupadas
+- [ ] "🗑 Apagar tudo" pede DUAS confirmações e depois o histórico fica vazio (verificar também no Dashboard)
+- [ ] Anexar uma imagem (📎) e perguntar "o que vês?" → o JARVIS descreve a imagem
+- [ ] Anexar imagem > 3,5 MB → mensagem de erro clara, sem crash
+- [ ] Anexar um .txt → o conteúdo entra no campo de mensagem
+- [ ] Nas Definições, ligar o modo mãos-livres → voltar à Conversa → dizer «JARVIS» funciona sem tocar em nada
 
 ### Idioma, vozes e exportação
 - [ ] Mudar o "Idioma" para English → falar em inglês → o JARVIS responde em inglês, com voz inglesa

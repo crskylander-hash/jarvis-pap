@@ -48,13 +48,20 @@ def _system_prompt(idioma: str) -> str:
     return f"{config.SYSTEM_PROMPT_JARVIS}\n{extra}" if extra else config.SYSTEM_PROMPT_JARVIS
 
 
-def gerar_resposta(historico: list[dict], mensagem: str, idioma: str = "pt-PT") -> tuple[str, int]:
+def gerar_resposta(
+    historico: list[dict],
+    mensagem: str,
+    idioma: str = "pt-PT",
+    imagem_base64: str | None = None,
+    imagem_tipo: str | None = None,
+) -> tuple[str, int]:
     """Chama o modelo com a memória da conversa e devolve (resposta, tokens_usados).
 
-    historico: lista de turnos anteriores do dispositivo, do mais antigo
-               para o mais recente: [{"user_input": ..., "claude_response": ...}, ...]
-    mensagem:  a pergunta atual do utilizador.
-    idioma:    idioma escolhido na app (a resposta vem nessa língua).
+    historico:     turnos anteriores do dispositivo, do mais antigo para o mais
+                   recente: [{"user_input": ..., "claude_response": ...}, ...]
+    mensagem:      a pergunta atual do utilizador.
+    idioma:        idioma escolhido na app (a resposta vem nessa língua).
+    imagem_*:      anexo opcional — o modelo tem visão e analisa a imagem.
     """
     # Converte o histórico para o formato de mensagens da API
     # (alternância user/assistant, exigida pela Anthropic)
@@ -62,7 +69,16 @@ def gerar_resposta(historico: list[dict], mensagem: str, idioma: str = "pt-PT") 
     for turno in historico:
         mensagens.append({"role": "user", "content": turno["user_input"]})
         mensagens.append({"role": "assistant", "content": turno["claude_response"]})
-    mensagens.append({"role": "user", "content": mensagem})
+
+    # A mensagem atual: só texto, ou imagem + texto (blocos de conteúdo)
+    if imagem_base64 and imagem_tipo:
+        conteudo = [
+            {"type": "image", "source": {"type": "base64", "media_type": imagem_tipo, "data": imagem_base64}},
+            {"type": "text", "text": mensagem},
+        ]
+    else:
+        conteudo = mensagem
+    mensagens.append({"role": "user", "content": conteudo})
 
     resposta = _obter_cliente().messages.create(
         model=config.ANTHROPIC_MODEL,

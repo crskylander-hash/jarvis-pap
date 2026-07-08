@@ -58,6 +58,15 @@ class PedidoChat(BaseModel):
     mensagem: str = Field(min_length=1, max_length=4000, description="Pergunta do utilizador")
     # Idioma escolhido na app (opcional; por defeito português de Portugal)
     idioma: str = Field(default="pt-PT", max_length=10, description="Idioma da resposta (ex.: pt-PT, en-GB)")
+    # Anexo de imagem (opcional): conteúdo em base64 + tipo. O modelo Claude
+    # consegue VER imagens — limite ~4 MB de base64 (≈3 MB de ficheiro).
+    imagem_base64: str | None = Field(default=None, max_length=5_500_000, description="Imagem anexada (base64)")
+    imagem_tipo: str | None = Field(default=None, max_length=20, description="Tipo MIME (image/jpeg, image/png, ...)")
+
+
+class PedidoApagar(BaseModel):
+    """Corpo do pedido POST /historico/apagar."""
+    device_id: str = Field(min_length=8, description="UUID anónimo do dispositivo")
 
 
 class RespostaChat(BaseModel):
@@ -93,15 +102,21 @@ def chat(pedido: PedidoChat):
         # 1) Memória: últimos 10 turnos deste dispositivo (sliding window)
         historico = base_dados.obter_historico(pedido.device_id, config.TURNOS_MEMORIA)
 
-        # 2) Chama o modelo (o SDK repete sozinho em caso de falha temporária)
-        texto, tokens = servico_claude.gerar_resposta(historico, pedido.mensagem, pedido.idioma)
+        # 2) Chama o modelo (o SDK repete sozinho em caso de falha temporária).
+        #    Se vier imagem anexada, o modelo analisa-a (visão).
+        texto, tokens = servico_claude.gerar_resposta(
+            historico, pedido.mensagem, pedido.idioma,
+            pedido.imagem_base64, pedido.imagem_tipo,
+        )
 
         latencia = int((time.monotonic() - inicio) * 1000)
 
-        # 3) Grava o turno no Supabase e atualiza a sessão
+        # 3) Grava o turno no Supabase e atualiza a sessão.
+        #    A imagem em si não é guardada (privacidade + espaço) — fica só a marca.
+        registo_pergunta = pedido.mensagem + (" 📎[imagem anexada]" if pedido.imagem_base64 else "")
         linha = base_dados.gravar_conversa(
             pedido.device_id, pedido.session_id,
-            pedido.mensagem, texto, tokens, latencia,
+            registo_pergunta, texto, tokens, latencia,
         )
         base_dados.atualizar_sessao(pedido.session_id, pedido.device_id)
 
@@ -136,6 +151,22 @@ def chat(pedido: PedidoChat):
             status_code=503,
             detail="Falha ao aceder à base de dados. Tenta novamente.",
         )
+
+
+# ------------------------------------------------------------
+# POST /historico/apagar — direito ao esquecimento
+# ------------------------------------------------------------
+@app.post("/historico/apagar")
+def apagar_historico(pedido: PedidoApagar):
+    """Apaga todo o histórico (conversas + sessões) de um dispositivo.
+    A app pede dupla confirmação antes de chamar este endpoint."""
+    try:
+        apagadas = base_dados.apagar_historico(pedido.device_id)
+        base_dados.registar_log("historico_apagado", f"{apagadas} conversas do device {pedido.device_id[:8]}…")
+        base_dados.enviar_broadcast(pedido.device_id, "historico_apagado", {"apagadas": apagadas})
+        return {"apagadas": apagadas}
+    except httpx.HTTPError:
+        raise HTTPException(status_code=503, detail="Falha ao apagar o histórico. Tenta novamente.")
 
 
 def _processar_envio_para_app(pedido: PedidoChat, inicio: float) -> RespostaChat:

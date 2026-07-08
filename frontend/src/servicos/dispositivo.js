@@ -30,3 +30,11 @@ export function obterSessionId() {
   }
   return id
 }
+
+/** Começa uma conversa nova: gera um session_id novo.
+ *  A conversa anterior fica guardada e passa a ver-se no Histórico. */
+export function novaSessao() {
+  const id = crypto.randomUUID()
+  sessionStorage.setItem(CHAVE_SESSAO, id)
+  return id
+}

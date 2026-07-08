@@ -8,8 +8,9 @@ import { obterIdioma } from './vozTTS.js'
 const URL_BACKEND = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000'
 
 /** Envia uma mensagem ao JARVIS e devolve a resposta do backend.
+ *  anexo (opcional): { base64, tipo } de uma imagem — o JARVIS consegue vê-la.
  *  Resposta: { resposta, display_mode, tokens_used, latency_ms } */
-export async function enviarMensagem(mensagem) {
+export async function enviarMensagem(mensagem, anexo = null) {
   const resposta = await fetch(`${URL_BACKEND}/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -18,6 +19,8 @@ export async function enviarMensagem(mensagem) {
       session_id: obterSessionId(),
       mensagem,
       idioma: obterIdioma(), // o JARVIS responde no idioma escolhido na app
+      imagem_base64: anexo ? anexo.base64 : null,
+      imagem_tipo: anexo ? anexo.tipo : null,
     }),
   })
 
@@ -32,6 +35,18 @@ export async function enviarMensagem(mensagem) {
   }
 
   return resposta.json()
+}
+
+/** Apaga TODO o histórico deste dispositivo (direito ao esquecimento).
+ *  A confirmação dupla é pedida na interface antes de chamar isto. */
+export async function apagarHistorico() {
+  const resposta = await fetch(`${URL_BACKEND}/historico/apagar`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ device_id: obterDeviceId() }),
+  })
+  if (!resposta.ok) throw new Error('Não foi possível apagar o histórico. Tenta novamente.')
+  return resposta.json() // { apagadas: n }
 }
 
 /** Verifica se o backend está online (indicador do dashboard). */

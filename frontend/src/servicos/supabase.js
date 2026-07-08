@@ -29,6 +29,17 @@ export async function obterHistorico(limite = 50) {
   return data
 }
 
+/** Vai buscar apenas as conversas de UMA sessão (a conversa atual). */
+export async function obterConversasDaSessao(sessionId) {
+  const { data, error } = await supabase
+    .from('conversations')
+    .select('*')
+    .eq('session_id', sessionId)
+    .order('timestamp', { ascending: true })
+  if (error) throw error
+  return data
+}
+
 /** Vai buscar apenas as respostas enviadas para a app (vista de leitura). */
 export async function obterRespostasParaApp() {
   const { data, error } = await supabase

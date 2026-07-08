@@ -153,6 +153,30 @@ def atualizar_sessao(session_id: str, device_id: str) -> None:
         ).raise_for_status()
 
 
+def apagar_historico(device_id: str) -> int:
+    """Apaga TODAS as conversas e sessões de um dispositivo.
+    Devolve o número de conversas apagadas. Só o backend (service key)
+    tem permissão de escrita — o pedido chega via POST /historico/apagar."""
+    resposta = httpx.request(
+        "DELETE",
+        _url_rest("conversations"),
+        headers={**_cabecalhos(), "Prefer": "return=representation"},
+        params={"device_id": f"eq.{device_id}"},
+        timeout=20,
+    )
+    resposta.raise_for_status()
+    apagadas = len(resposta.json())
+    # Apaga também as sessões associadas (estatísticas)
+    httpx.request(
+        "DELETE",
+        _url_rest("sessions"),
+        headers=_cabecalhos(),
+        params={"device_id": f"eq.{device_id}"},
+        timeout=20,
+    ).raise_for_status()
+    return apagadas
+
+
 # ------------------------------------------------------------
 # LOGS DO SISTEMA
 # ------------------------------------------------------------

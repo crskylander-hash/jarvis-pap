@@ -50,7 +50,7 @@ def bd_simulada(monkeypatch):
 def claude_simulado(monkeypatch):
     """Substitui as chamadas à API da Anthropic por respostas fixas."""
     monkeypatch.setattr(servico_claude, "gerar_resposta",
-                        lambda h, m, idioma="pt-PT": ("Resposta simulada do JARVIS.", 42))
+                        lambda h, m, idioma="pt-PT", img=None, tipo=None: ("Resposta simulada do JARVIS.", 42))
     monkeypatch.setattr(servico_claude, "resumir_para_voz",
                         lambda t, idioma="pt-PT": ("Resumo numa frase.", 10))
 
@@ -104,7 +104,7 @@ def test_chat_com_idioma(bd_simulada, monkeypatch):
     """O idioma escolhido na app chega ao serviço do modelo."""
     idiomas_recebidos = []
 
-    def gerar_falso(historico, mensagem, idioma="pt-PT"):
+    def gerar_falso(historico, mensagem, idioma="pt-PT", img=None, tipo=None):
         idiomas_recebidos.append(idioma)
         return ("Simulated JARVIS reply.", 42)
 
@@ -117,6 +117,41 @@ def test_chat_com_idioma(bd_simulada, monkeypatch):
     })
     assert resposta.status_code == 200
     assert idiomas_recebidos == ["en-GB"]
+
+
+def test_chat_com_imagem_regista_marca(bd_simulada, monkeypatch):
+    """Com imagem anexada, o modelo recebe-a e a gravação leva a marca 📎."""
+    recebidos = {}
+
+    def gerar_falso(historico, mensagem, idioma="pt-PT", img=None, tipo=None):
+        recebidos["img"] = img
+        recebidos["tipo"] = tipo
+        return ("Vejo uma imagem.", 50)
+
+    monkeypatch.setattr(servico_claude, "gerar_resposta", gerar_falso)
+    resposta = cliente.post("/chat", json={
+        "device_id": "dispositivo-teste-123",
+        "session_id": "sessao-teste-123",
+        "mensagem": "O que vês nesta imagem?",
+        "imagem_base64": "QUJDMTIz",
+        "imagem_tipo": "image/png",
+    })
+    assert resposta.status_code == 200
+    assert recebidos["img"] == "QUJDMTIz"
+    assert recebidos["tipo"] == "image/png"
+    # A pergunta gravada leva a marca do anexo (a imagem em si não é guardada)
+    args_gravacao = bd_simulada[0][0]
+    assert "📎[imagem anexada]" in args_gravacao[2]
+
+
+def test_apagar_historico(monkeypatch):
+    """O endpoint de apagar histórico devolve o número de conversas apagadas."""
+    monkeypatch.setattr(base_dados, "apagar_historico", lambda d: 7)
+    monkeypatch.setattr(base_dados, "registar_log", lambda *a: None)
+    monkeypatch.setattr(base_dados, "enviar_broadcast", lambda *a, **k: None)
+    resposta = cliente.post("/historico/apagar", json={"device_id": "dispositivo-teste-123"})
+    assert resposta.status_code == 200
+    assert resposta.json()["apagadas"] == 7
 
 
 def test_system_prompt_muda_com_idioma():
