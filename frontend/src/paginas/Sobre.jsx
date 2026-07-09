@@ -94,9 +94,9 @@ export default function Sobre() {
         <p>
           Este projeto nasceu de uma pergunta: <em>será possível construir o núcleo
           inteligente dos assistentes vestíveis modernos — como os óculos com IA —
-          com o orçamento e os conhecimentos de um estudante?</em> O JARVIS é a
-          resposta, desenvolvido como Prova de Aptidão Profissional (PAP): um
-          produto completo, publicado na Internet e utilizável por qualquer pessoa.
+          com o orçamento e os conhecimentos de um estudante?</em> O JARVIS foi
+          desenvolvido no âmbito da Prova de Aptidão Profissional (PAP): um
+          produto open source para qualquer pessoa.
         </p>
       </Seccao>
 
