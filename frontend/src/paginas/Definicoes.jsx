@@ -69,12 +69,20 @@ export default function Definicoes() {
         </p>
       </Seccao>
 
-      <Seccao titulo="Voz personalizada">
-        <p className="text-sm leading-relaxed text-jarvis-texto/60">
-          🔬 <em>Em estudo:</em> gravar a tua própria voz e usá-la como a voz do
-          JARVIS (clonagem de voz). Esta tecnologia exige serviços externos de
-          síntese neural e levanta questões de privacidade que queremos tratar
-          bem — está documentada como melhoria futura do projeto.
+      <Seccao titulo="Voz personalizada — funcionalidade desenhada 🔬">
+        <p className="text-sm leading-relaxed text-jarvis-texto/70">
+          Em desenvolvimento futuro: usar a <strong className="text-jarvis-ciano">tua própria voz</strong> como
+          voz do JARVIS. O plano técnico já está definido:
+        </p>
+        <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-jarvis-texto/60">
+          <li>Gravas ~60 segundos de leitura aqui nas Definições;</li>
+          <li>Um serviço de síntese neural treina um clone da tua voz (com o teu consentimento explícito);</li>
+          <li>As respostas passam a ser faladas com a tua voz, natural e sem som robótico.</li>
+        </ol>
+        <p className="mt-2 text-xs text-jarvis-texto/45">
+          Não está ativa nesta versão: a tecnologia do browser não suporta vozes
+          personalizadas e a clonagem neural exige serviços externos pagos —
+          decisão documentada no projeto (privacidade e consentimento em primeiro lugar).
         </p>
       </Seccao>
 
