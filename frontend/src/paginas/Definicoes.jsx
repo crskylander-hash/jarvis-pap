@@ -38,9 +38,13 @@ export default function Definicoes() {
         {/* Idioma da conversa + velocidade + voz (guardados automaticamente) */}
         <ControloVelocidade />
         <p className="mt-3 text-xs leading-relaxed text-jarvis-texto/50">
-          💡 As vozes disponíveis dependem do teu dispositivo. No Windows podes
-          instalar mais em: Definições → Hora e idioma → Voz → «Adicionar vozes».
-          No Android, em: Definições → Sistema → Idiomas → Saída de texto para voz.
+          💡 As vozes disponíveis dependem do teu dispositivo e do browser.
+          <strong className="text-jarvis-ciano/80"> Dica de ouro:</strong> no{' '}
+          <strong>Microsoft Edge</strong> aparecem as vozes neurais «Online
+          (Natural)» da Microsoft — qualidade muito superior, gratuitas
+          (ex.: «Microsoft Duarte Online (Natural)» em pt-PT). No Windows podes
+          instalar mais em: Definições → Hora e idioma → Voz; no Android, em:
+          Definições → Sistema → Saída de texto para voz.
         </p>
       </Seccao>
 
